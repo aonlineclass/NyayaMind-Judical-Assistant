@@ -34,7 +34,7 @@ This installs all required Node.js modules.
 
 5.  Environment setup:
 
-You will be given a `.env` file.
+You will be given a `.env` file download it from google drive link above , when you have ur env file , you need to rename the file  it to  .env
 
 -   Copy the `.env` file
 -   Paste it into the **root folder** of the project

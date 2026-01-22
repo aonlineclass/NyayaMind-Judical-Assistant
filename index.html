@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NyayaMind- Global Precedent Search</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .glass { backdrop-filter: blur(20px); background: rgba(255, 255, 255, 0.95); border: 1px solid rgba(59, 130, 246, 0.2); }
+        .blue-glow { box-shadow: 0 0 30px rgba(59, 130, 246, 0.4); }
+        .fade-in { animation: fadeIn 0.5s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .line-clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+        .blue-gradient { background: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #1d4ed8 100%); }
+        .filter-tags { background: #eff6ff; border: 1px solid #bfdbfe; }
+        .ai-chat { min-height: 200px; max-height: 300px; }
+        .spinner { border: 4px solid rgba(59, 130, 246, 0.1); border-top: 4px solid #3b82f6; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .loading-container { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 20px; }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 via-indigo-50 to-slate-50 min-h-screen font-sans antialiased">
+
+    <!-- NAV -->
+    <nav class="glass border-b border-blue-200 shadow-xl sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-2">
+                    <div class="w-10 h-10 blue-gradient rounded-xl flex items-center justify-center shadow-lg">
+                        <i class="fas fa-balance-scale text-xl text-white"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold bg-gradient-to-r from-blue-900 to-indigo-900 bg-clip-text text-transparent">NyayaMind</h1>
+                        <p class="text-xs text-blue-600 font-medium">Global Precedent Intelligence</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div class="grid lg:grid-cols-3 gap-8">
+            
+            <!-- MAIN SEARCH + FILTERS -->
+            <div class="lg:col-span-2 space-y-8">
+                
+                <!-- PROFESSIONAL FILTER DROPDOWN (TOP) -->
+                <div class="max-w-4xl mx-auto relative z-50">
+                    <button id="filterDropdownBtn" onclick="toggleFilterDropdown()" class="glass rounded-3xl px-8 py-4 shadow-xl fade-in border border-blue-200 hover:border-blue-400 transition-all w-full flex items-center justify-between hover:shadow-2xl">
+                        <div class="flex items-center space-x-3">
+                            <i class="fas fa-filter text-blue-500 text-lg"></i>
+                            <span class="font-bold text-blue-900">Filter by Case Type</span>
+                            <span id="selectedFilterText" class="text-sm text-blue-600 font-medium ml-4">All Categories</span>
+                        </div>
+                        <i id="filterDropdownIcon" class="fas fa-chevron-down text-blue-500 text-lg transition-transform duration-300"></i>
+                    </button>
+
+                    <!-- FILTER DROPDOWN MENU -->
+                    <div id="filterDropdownMenu" class="hidden absolute left-0 right-0 top-[calc(100%+12px)] bg-white rounded-2xl shadow-2xl border border-blue-200 z-50 overflow-hidden max-h-80 overflow-y-auto">
+                        <div class="divide-y divide-blue-100">
+                            <button onclick="selectFilter('All Categories', this)" class="filter-option w-full px-6 py-4 text-left transition-all text-sm font-medium text-slate-800 hover:bg-blue-50 flex items-center justify-between group">
+                                <div class="flex items-center space-x-3">
+                                    <i class="fas fa-list text-slate-400 group-hover:text-blue-500"></i>
+                                    <span>All Categories</span>
+                                </div>
+                                <i class="fas fa-check text-green-500 hidden group-hover:inline transition-all"></i>
+                            </button>
+                            <button onclick="selectFilter('landproperty', this)" class="filter-option w-full px-6 py-4 text-left transition-all text-sm font-medium text-slate-800 hover:bg-blue-50 flex items-center justify-between group">
+                                <div class="flex items-center space-x-3">
+                                    <i class="fas fa-landmark text-green-500 group-hover:scale-110 transition-transform"></i>
+                                    <span>Land/Property</span>
+                                </div>
+                                <i class="fas fa-check text-green-500 hidden"></i>
+                            </button>
+                            <button onclick="selectFilter('anticipatorybail', this)" class="filter-option w-full px-6 py-4 text-left transition-all text-sm font-medium text-slate-800 hover:bg-blue-50 flex items-center justify-between group">
+                                <div class="flex items-center space-x-3">
+                                    <i class="fas fa-gavel text-blue-500 group-hover:scale-110 transition-transform"></i>
+                                    <span>Anticipatory Bail</span>
+                                </div>
+                                <i class="fas fa-check text-green-500 hidden"></i>
+                            </button>
+                            <button onclick="selectFilter('ipc420fraud', this)" class="filter-option w-full px-6 py-4 text-left transition-all text-sm font-medium text-slate-800 hover:bg-blue-50 flex items-center justify-between group">
+                                <div class="flex items-center space-x-3">
+                                    <i class="fas fa-file-contract text-red-500 group-hover:scale-110 transition-transform"></i>
+                                    <span>IPC 420 Fraud</span>
+                                </div>
+                                <i class="fas fa-check text-green-500 hidden"></i>
+                            </button>
+                            <button onclick="selectFilter('ipc498a', this)" class="filter-option w-full px-6 py-4 text-left transition-all text-sm font-medium text-slate-800 hover:bg-blue-50 flex items-center justify-between group">
+                                <div class="flex items-center space-x-3">
+                                    <i class="fas fa-heart-broken text-pink-500 group-hover:scale-110 transition-transform"></i>
+                                    <span>IPC 498A</span>
+                                </div>
+                                <i class="fas fa-check text-green-500 hidden"></i>
+                            </button>
+                            <button onclick="selectFilter('familycases', this)" class="filter-option w-full px-6 py-4 text-left transition-all text-sm font-medium text-slate-800 hover:bg-blue-50 flex items-center justify-between group">
+                                <div class="flex items-center space-x-3">
+                                    <i class="fas fa-users text-purple-500 group-hover:scale-110 transition-transform"></i>
+                                    <span>Family Cases</span>
+                                </div>
+                                <i class="fas fa-check text-green-500 hidden"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SEARCH BAR WITH RECOMMENDATIONS -->
+                <div class="max-w-4xl mx-auto relative z-40">
+                    <div class="glass rounded-3xl p-8 shadow-2xl blue-glow fade-in relative">
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                <i class="fas fa-search text-blue-400 text-lg"></i>
+                            </div>
+                            <input type="text" id="mainSearch" placeholder="Search precedents: IPC 420, land dispute, bail..." 
+                                class="w-full pl-12 pr-12 py-4 text-lg bg-white border-2 border-blue-200 rounded-3xl focus:border-blue-400 focus:outline-none focus:ring-4 focus:ring-blue-100 transition-all" onfocus="showRecommendations()">
+                            <button id="searchbtn" class="absolute inset-y-0 right-0 pr-4 flex items-center px-6 py-4 blue-gradient hover:from-blue-600 hover:to-indigo-600 text-white rounded-2xl font-semibold shadow-lg hover:shadow-xl transition-all">
+                                <i class="fas fa-search mr-2"></i>Search
+                            </button>
+                        </div>
+
+                        <!-- RECOMMENDATIONS DROPDOWN (YouTube Style) - Extends Search Bar -->
+                        <div id="recommendationsDropdown" class="hidden absolute left-0 right-0 top-[calc(100%+8px)] bg-white rounded-b-2xl shadow-2xl border border-t-0 border-blue-200 z-50">
+                            <div class="max-h-96 overflow-y-auto">
+                                <div id="recommendationsList" class="divide-y divide-blue-100">
+                                    <!-- Recommendations will be populated here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RESULTS -->
+                <div id="resultsSection" class="space-y-6">
+                    <div class="glass rounded-2xl p-6 shadow-xl">
+                        <h2 class="text-3xl font-bold text-blue-900">Court Orders</h2>
+                        <p id="casespart" class="text-lg text-slate-600 mt-2">Click any case for detailed analysis + AI Counsel</p>
+                    </div>
+                    <div id="casesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+                </div>
+            </div>
+
+            <!-- STICKY RECOMMENDED -->
+            <div class="lg:col-span-1 space-y-6 lg:sticky lg:top-24 self-start">
+                
+                <!-- STATIC SEARCH AREA -->
+                <div class="glass rounded-2xl p-6 shadow-xl blue-glow border border-blue-200">
+                    <h3 class="text-lg font-bold text-blue-900 mb-4 flex items-center">
+                        <i class="fas fa-search mr-2 text-blue-500"></i>Quick Search
+                    </h3>
+                    <div class="space-y-3 text-sm" id="quicksearchsection">
+                        
+                        
+                    </div>
+                </div>
+
+                <!-- RECOMMENDED CASES -->
+                <div class="glass rounded-3xl p-8 shadow-2xl blue-glow">
+                    <h3 class="text-xl font-bold text-blue-900 mb-6 flex items-center">
+                        <i class="fas fa-star text-yellow-400 mr-3"></i>Top Precedents
+                    </h3>
+                    <div id="recommendedCases" class="space-y-4 max-h-[60vh] overflow-y-auto pr-2"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- REDESIGNED POPUP WITH ASK AI SYSTEM -->
+    <div id="caseModal" class="fixed inset-0 bg-black/80 hidden z-50 flex items-center justify-center p-6">
+        <div class="glass w-full max-w-5xl max-h-[90vh] rounded-3xl shadow-2xl overflow-hidden fade-in">
+            <!-- HEADER -->
+            <div class="blue-gradient text-white p-8 pb-6">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h2 class="text-3xl font-bold" id="modalCaseTitle">CrApp(DB) 156/2026</h2>
+                        <p class="text-blue-100 opacity-90 mt-1" id="modalCourtInfo">Jharkhand High Court • 2026</p>
+                    </div>
+                    <button onclick="document.getElementById('aiResponseArea').innerHTML=''; document.getElementById('caseModal').classList.add('hidden')" 
+                        class="text-white hover:text-slate-200 text-2xl p-3 rounded-xl hover:bg-white/20 transition-all">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="p-8 max-h-[70vh] overflow-y-auto">
+                <div class="grid lg:grid-cols-3 gap-8">
+                    
+                    <!-- LEFT: CASE DETAILS (2/3 width) -->
+                    <div class="lg:col-span-2 space-y-6">
+                        <!-- ABOUT CASE SECTION -->
+                        <div class="bg-white rounded-2xl p-8 shadow-inner border border-blue-100">
+                            <h4 class="font-bold text-2xl text-blue-900 mb-6 flex items-center">
+                                <i class="fas fa-file-alt mr-3 text-blue-500"></i>About Case
+                            </h4>
+                            <div id="modalCaseContent" class="space-y-4 text-base text-slate-800 leading-relaxed">
+                                <!-- DYNAMIC CONTENT LOADED BY JS -->
+                            </div>
+                        </div>
+                        
+                        <!-- FULL ORDER SECTION -->
+                        <div class="bg-slate-50 rounded-2xl p-8 border border-slate-200">
+                            <h4 class="font-bold text-2xl text-slate-900 mb-4 flex items-center">
+                                <i class="fas fa-scroll mr-3 text-slate-600"></i>Full Order
+                            </h4>
+                            <div id="modalFullOrder" class="bg-white rounded-xl p-6 border border-slate-200 max-h-48 overflow-y-auto text-sm text-slate-700 leading-relaxed font-mono">
+                                <!-- Full order text will be populated here -->
+                            </div>
+                         
+                        </div>
+                        
+                        <!-- AI ANALYSED JUDGMENT -->
+                        <div class="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-2xl p-8 border border-emerald-200">
+                        
+                            <div id="modalAISummary" class="text-emerald-900 text-base leading-relaxed space-y-3">
+                                   <div class="mt-4 pt-4 border-t border-emerald-300">
+                    <p class="font-semibold text-emerald-900 mb-2">Key Findings:</p>
+                    <p id="keyfin" class="text-sm text-black">
+                        </p>
+                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- KEY POINTS
+                        <div class="bg-gradient-to-r from-orange-50 to-red-50 rounded-2xl p-8 border border-orange-200">
+                            <h4 class="font-bold text-2xl text-orange-900 mb-4 flex items-center">
+                                <i class="fas fa-star mr-3 text-yellow-500"></i>Key Points
+                            </h4>
+                            <ul id="modalKeyPoints" class="space-y-3 text-orange-900 text-base">
+                                <li class="flex items-start">
+                                    <span class="text-yellow-600 mr-3 font-bold">•</span>
+                                    <span>Loading key points...</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div> -->
+                    
+                    <!-- RIGHT: AI COUNSEL ASSISTANT (1/3 width) -->
+                    <div class="lg:col-span-1 flex flex-col space-y-4">
+                        <!-- ASK AI COUNSEL SECTION -->
+                        <div class="glass rounded-2xl p-6 border-2 border-blue-200 shadow-2xl bg-gradient-to-br from-blue-50 to-indigo-50">
+                            <h4 class="font-bold text-xl text-blue-900 mb-4 flex items-center">
+                                <i class="fas fa-message text-blue-500 mr-2 text-lg"></i>Ask AI Counsel
+                            </h4>
+                            
+                            <!-- AI INPUT TEXTAREA -->
+                            <div class="space-y-3">
+                                <textarea id="aiQueryInput" placeholder="Ask about case strategy, bail chances, similar precedents, risks..." 
+                                    class="w-full bg-white border-2 border-blue-200 rounded-xl px-4 py-3 text-sm focus:border-blue-400 focus:ring-4 focus:ring-blue-100 font-medium resize-none h-20"></textarea>
+                                <button id="aiQueryBtn" onclick="showAIResponse()" 
+                                    class="w-full blue-gradient hover:from-blue-600 hover:to-indigo-600 text-white py-2 rounded-xl font-bold shadow-lg hover:shadow-xl flex items-center justify-center transition-all">
+                                    <i class="fas fa-paper-plane mr-2"></i>Ask AI
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- ANALYSIS SECTION -->
+                        <div class="rounded-2xl p-6 border border-slate-200 bg-white">
+                            <h4 class="font-bold text-xl text-slate-900 mb-4 flex items-center">
+                                <i class="fas fa-lightbulb text-slate-600 mr-2 text-lg"></i>Analysis
+                            </h4>
+                            
+                            <!-- AI RESPONSE AREA -->
+                            <div id="aiResponseArea" class="bg-slate-50 rounded-xl p-6 border border-slate-200 max-h-64 overflow-y-auto text-sm text-slate-700 leading-relaxed min-h-32">
+                                <!-- Results will appear here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+            
+        const arrayquick = ["Bail denied due to absconding risk","Eviction without rehabilitation","Quash FIR in civil dispute","Economic offence long custody bail","Land acquisition without hearing"]
+        const sectionquick = document.getElementById("quicksearchsection");
+        arrayquick.forEach((value)=>{
+            sectionquick.innerHTML+=`
+        <div class="flex items-center p-3 bg-blue-50 rounded-xl cursor-pointer hover:bg-blue-100 transition-all">
+                            <i class="fas fa-landmark text-green-500 mr-3"></i>
+                            <span onclick="putquicktosearch(this)">${value}</span>
+                        </div>
+        `
+        })
+         function putquicktosearch(e){
+            document.getElementById("mainSearch").value = e.innerHTML
+            console.log("quick sssearch")
+
+
+         }
+             
+         function openCaseModal(opencaseid){
+            console.log("Case ID:", opencaseid)
+            
+            // Find the case by case_id in casesData array
+            const caseData = casesData.find(c => c.case_id === opencaseid);
+            
+            if (!caseData) {
+                console.log("Case not found in data");
+                alert('Case not found');
+                return;
+            }
+            
+            console.log("Case Data:", caseData)
+            const b = localStorage.setItem("result",JSON.stringify(caseData))
+            
+            // Display case in modal
+            document.getElementById('modalCaseTitle').textContent = caseData.case_id;
+            document.getElementById('modalCourtInfo').textContent = `${caseData.court} • ${caseData.year}`;
+            
+            // LEFT SIDE - CASE DETAILS
+            document.getElementById('modalCaseContent').innerHTML = `
+                <div class="space-y-4">
+                    <div class="font-semibold text-slate-900 text-base mb-3">
+                        <span class="text-blue-600">Case Type:</span> ${caseData.case_type}
+                    </div>
+                    <div class="text-slate-700">
+                        <p class="font-semibold mb-2">About:</p>
+                        <p>${caseData.about}</p>
+                    </div>
+                 
+                    <div class="text-slate-700 mt-4 p-4 bg-blue-50 rounded-lg border-l-4 border-blue-400">
+                        <p class="font-semibold mb-2">Judge:</p>
+                        <p>${caseData.judge}</p>
+                    </div>
+                </div>
+            `;
+            
+            // FULL ORDER SECTION
+            document.getElementById('modalFullOrder').textContent = caseData.full_order || 'No full order available';
+             
+           const keyfin =  document.getElementById("keyfin")
+           keyfin.innerHTML="Loading key findings please wait....."
+            
+            const localsto = localStorage.getItem("result")
+            let data = {
+                query:localsto
+            }
+
+            fetch("/operations/anylyzequery",{
+                method:"POST",
+                headers:{
+                     'Content-Type': 'application/json'
+                },
+                body:JSON.stringify(data)
+            }).then((nextdta)=>{return nextdta.json()}).then((fdata)=>{
+                keyfin.innerHTML=""
+
+                  fdata.result.keyfindings.forEach((element,index) => {
+                      keyfin.innerHTML +=`
+                       <ul>${index+1}. ${element}<ul><br>
+                      `
+                          ;
+                    
+                  })
+
+            
+            }).catch((err)=>{
+                keyfin.innerHTML="Not able to find keyfindings !!"
+            })
+         
+            
+         
+
+
+            document.getElementById('aiQueryInput').value = '';
+            document.getElementById('caseModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        
+       
+        
+        // Close modal when clicking outside
+        document.addEventListener('DOMContentLoaded', function() {
+
+            localStorage.removeItem("result");
+            const modal = document.getElementById('caseModal');
+            if (modal) {
+                modal.addEventListener('click', function(e) {
+                    if (e.target === modal) {
+                        modal.classList.add('hidden');
+                        document.body.style.overflow = 'auto';
+                    }
+                });
+            }
+        });
+        
+        // Close modal on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                document.getElementById('caseModal').classList.add('hidden');
+                document.body.style.overflow = 'auto';
+            }
+        });
+        // GLOBAL VARIABLES
+        let casesData = []; // Store all cases globally
+        const searchbtn = document.getElementById("searchbtn")
+        const mainsearchinput = document.getElementById("mainSearch")
+        let debounceTimer; // Variable must live outside the event listener
+
+        mainsearchinput.addEventListener("input", (e) => {
+            clearTimeout(debounceTimer);
+            const searchValue = e.target.value;
+            const dropdown = document.getElementById('recommendationsDropdown');
+            
+            if (searchValue.trim() === '') {
+                dropdown.classList.add('hidden');
+                return;
+            }
+            
+            debounceTimer = setTimeout(() => {
+                fetch("/operations/queryrecomnd",{
+                    method:"POST",
+                    headers:{
+                        "Content-Type":"application/json"
+                    },
+                    body:JSON.stringify({query:searchValue})
+                }).then((nextdata) =>{ return nextdata.json()}).then((data)=>{
+                    if (data.resultrecomnd && data.resultrecomnd.length > 0) {
+                        renderRecommendations(data.resultrecomnd);
+                        dropdown.classList.remove('hidden');
+                    } else {
+                        dropdown.classList.add('hidden');
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error fetching recommendations:', error);
+                    dropdown.classList.add('hidden');
+                });
+            }, 300);
+        });
+
+        searchbtn.addEventListener("click",(e)=>{
+            const mainsearchinput = document.getElementById("mainSearch").value;
+            const filtertext = document.getElementById("selectedFilterText").innerHTML;
+            const casesGrid = document.getElementById("casesGrid");
+            
+            // Show loading spinner
+            casesGrid.innerHTML = `
+                <div class="col-span-full loading-container">
+                    <div class="spinner"></div>
+                    <p class="text-slate-600 text-lg mt-4 font-medium">Fetching cases...</p>
+                </div>
+            `;
+            
+            let dataset = {
+                query:mainsearchinput,
+                filter: {
+                 key: "case_type",
+                 match: { value: `${filtertext}` },
+                },
+            }
+            
+            fetch("/operations/querycases",{
+            method: 'POST',  
+            headers: {   
+                'Content-Type': 'application/json'
+                },
+             body: JSON.stringify(dataset) 
+
+            }).then((returned)=>{
+                return returned.json()
+
+            }).then((data)=>{
+                const casespart = document.getElementById("casespart")
+                casesGrid.innerHTML=""
+                casesData = [];
+                if(data.result && data.result.length != 0 ){
+                    data.result.forEach((c, index)=>{
+                        const temp = c.payload
+                        casesData.push(temp);
+                        casesGrid.innerHTML+=`
+                   <div index=${temp.case_id} class="glass hover:bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl border border-blue-200 cursor-pointer transition-all group" onclick="openCaseModal('${temp.case_id}')">
+                <h4 class="font-bold text-xl text-blue-900 mb-3">${temp.case_id}</h4>
+                <div class="flex items-center text-blue-900 mb-3">
+                    <i class="fas fa-building mr-2"></i>${temp.court} <span class="ml-2 text-sm text-slate-500">(${temp.year})</span>
+                </div>
+                <p class="text-slate-700 line-clamp-3">${temp.about}</p>
+                <div class="flex items-center mt-4 pt-3 border-t border-blue-200 opacity-0 group-hover:opacity-100 transition-all">
+                    <div class="flex space-x-3 text-sm">
+                        <button class="p-2 rounded-lg hover:bg-blue-50 text-blue-500 flex items-center">
+                            <i class="fas fa-thumbs-up mr-1"></i>Like
+                        </button>
+                        <button class="p-2 rounded-lg hover:bg-red-50 text-red-500 flex items-center">
+                            <i class="fas fa-thumbs-down mr-1"></i>Dislike
+                        </button>
+                    </div>
+                </div>
+            </div>
+            `
+                    })
+                } else {
+                    casesGrid.innerHTML = `<div class="col-span-full text-center py-12">
+                        <i class="fas fa-inbox text-5xl text-slate-300 mb-4"></i>
+                        <p class="text-slate-500 text-xl font-medium">No related cases found</p>
+                    </div>`;
+                }
+
+                casespart.innerHTML= `found ${casesData.length} Courtcase orders for query "${mainsearchinput}"`
+            })
+            .catch((error) => {
+                console.error('Error fetching cases:', error);
+                casesGrid.innerHTML = `<div class="col-span-full text-center py-12">
+                    <i class="fas fa-exclamation-circle text-5xl text-red-300 mb-4"></i>
+                    <p class="text-red-500 text-xl font-medium">Something unexpected occured.Please try again.</p>
+                </div>`;
+            });
+        })
+
+      
+       
+
+     
+
+    
+        // document.getElementById('recommendedCases').innerHTML = casesData.slice(0,4).map((c, index) => `
+        //     <div class="glass hover:bg-white p-5 rounded-xl shadow-md hover:shadow-lg cursor-pointer border border-blue-200 transition-all group" onclick="openCaseModal(${index})">
+        //         <div class="flex justify-between items-start mb-2">
+        //             <h5 class="font-bold text-lg text-blue-900">${c.caseNo}</h5>
+        //             <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">${c.year}</span>
+        //         </div>
+        //         <p class="text-sm text-slate-700">${c.summary}</p>
+        //         <div class="flex items-center justify-between mt-3 pt-2 border-t border-blue-100 opacity-0 group-hover:opacity-100">
+        //             <span class="text-xs text-blue-600">${c.court}</span>
+        //             <div class="flex space-x-2">
+        //                 <i class="fas fa-thumbs-up text-blue-500 hover:text-blue-600 cursor-pointer text-sm"></i>
+        //                 <i class="fas fa-thumbs-down text-red-500 hover:text-red-600 cursor-pointer text-sm"></i>
+        //             </div>
+        //         </div>
+        //     </div>
+        // `).join('');
+
+        // function openCaseModal(index) {
+        //     if (!casesData || !casesData[index]) {
+        //         alert('Case data not found');
+        //         return;
+        //     }
+            
+        //     const c = casesData[index];
+        //     document.getElementById('modalCaseTitle').textContent = c.case_id;
+        //     document.getElementById('modalCourtInfo').textContent = `${c.court} • ${c.year}`;
+        //     document.getElementById('modalCaseContent').innerHTML = `
+        //         <div class="space-y-4">
+        //             <div class="font-semibold text-slate-900 text-lg mb-3">
+        //                 <span class="text-blue-600">Case Type:</span> ${c.case_type}
+        //             </div>
+        //             <div class="text-slate-700">
+        //                 <p class="font-semibold mb-2">About:</p>
+        //                 <p>${c.about}</p>
+        //             </div>
+        //             <div class="text-slate-700 mt-4">
+        //                 <p class="font-semibold mb-2">Summary:</p>
+        //                 <p>${c.summary}</p>
+        //             </div>
+        //             <div class="text-slate-700 mt-4 p-4 bg-blue-50 rounded-lg border-l-4 border-blue-400">
+        //                 <p class="font-semibold mb-2">Judge:</p>
+        //                 <p>${c.judge}</p>
+        //             </div>
+        //         </div>
+        //     `;
+        //     document.getElementById('modalAISummary').textContent = c.summary.substring(0, 150) + '...';
+        //     document.getElementById('aiChatArea').innerHTML = `
+        //         <div class="flex items-start space-x-3 mb-4 p-4 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-2xl">
+        //             <div class="w-10 h-10 blue-gradient rounded-2xl flex items-center justify-center flex-shrink-0">
+        //                 <i class="fas fa-robot text-white text-xl"></i>
+        //             </div>
+        //             <div class="flex-1">
+        //                 <p class="font-bold text-lg">Case ${c.case_id} Analysis Ready! 👋</p>
+        //                 <p class="text-blue-100">Ask about bail chances, winning strategy, similar precedents, or legal arguments.</p>
+        //             </div>
+        //         </div>
+        //     `;
+        //     document.getElementById('caseModal').classList.remove('hidden');
+        //     document.body.style.overflow = 'hidden';
+        // }
+
+       
+        
+       async function showAIResponse() {
+            const query1 = document.getElementById('aiQueryInput').value.trim();
+            const textarea = document.getElementById("aiResponseArea")
+            const aiQueryBtn = document.getElementById("aiQueryBtn")
+            let data = {
+            query:query1,
+            dataset:localStorage.getItem("result")
+            }
+            aiQueryBtn.innerHTML="Please wait!"
+            fetch("/operations/anaskquery",{
+            method: 'POST',  
+            headers: {   
+                'Content-Type': 'application/json'
+                },
+             body: JSON.stringify(data) 
+
+            }).then((e)=>{return e.json()}).then((data)=>{
+                  const v = data.result;
+                  aiQueryBtn.innerHTML = `<i class="fas fa-paper-plane mr-2"> Ask AI`
+                  textarea.innerHTML+=`
+                    <div class="flex my-3 items-start space-x-3 p-3 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-xl">
+                    <div class="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-robot text-white text-sm"></i>
+                    </div>
+                    <div class="flex-1">
+                        <p class="font-bold text-sm">Case ${v}</p>
+                        <p class="text-blue-100 text-xs">Ask about strategy, bail chances, or risks</p>
+                    </div>
+                </div>`
+            })
+        }
+
+     
+
+        document.getElementById('aiQueryInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                showAIResponse();
+            }
+        });
+
+        // CLOSE MODAL ESCAPE
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                document.getElementById("aiResponseArea").innerHTML="";
+                document.getElementById('caseModal').classList.add('hidden');
+                document.body.style.overflow = 'auto';
+            }
+        });
+
+
+        // SHOW RECOMMENDATIONS WHEN FOCUS
+        function showRecommendations() {
+            const dropdown = document.getElementById('recommendationsDropdown');
+            const searchInput = document.getElementById('mainSearch').value;
+            
+            if (searchInput === '') {
+                dropdown.classList.add('hidden');
+            } else {
+                dropdown.classList.remove('hidden');
+            }
+        }
+
+        // FILTER RECOMMENDATIONS - Now handled by the fetch in addEventListener
+        // function filterRecommendations(query) {
+        //     const dropdown = document.getElementById('recommendationsDropdown');
+        //     
+        //     if (query.trim() === '') {
+        //         dropdown.classList.add('hidden');
+        //         return;
+        //     }
+        //
+        //     const filtered = allRecommendations.filter(rec => 
+        //         rec.text.toLowerCase().includes(query.toLowerCase())
+        //     );
+        //
+        //     renderRecommendations(filtered);
+        //     dropdown.classList.remove('hidden');
+        // }
+
+
+        // RENDER RECOMMENDATIONS
+        function renderRecommendations(recommendations) {
+            const list = document.getElementById('recommendationsList');
+            list.innerHTML = '';
+
+            if (!recommendations || recommendations.length === 0) {
+                list.innerHTML = '<div class="p-6 text-center text-slate-500 text-lg">Not able to find relevant cases</div>';
+                return;
+            }
+
+            recommendations.forEach((rec, index) => {
+                const div = document.createElement('div');
+                const payload = rec.payload || {};
+                const queryText = payload.query || 'Recommendation';
+                const score = rec.score ? (rec.score * 100).toFixed(0) : '0';
+                
+                div.innerHTML = `
+                    <div class="px-6 py-4 hover:bg-blue-50 cursor-pointer transition-all flex items-center space-x-4 group" onclick="selectRecommendation('${queryText.replace(/'/g, "\\'")}')">
+                        <i class="fas fa-search text-blue-500 text-lg w-6 group-hover:scale-125 transition-transform"></i>
+                        <div class="flex-1">
+                            <p class="text-lg font-medium text-slate-800 group-hover:text-blue-600">${queryText}</p>
+                            <p class="text-xs text-slate-400">Relevance: ${score}%</p>
+                        </div>
+                        <i class="fas fa-arrow-right text-slate-300 group-hover:text-blue-500 opacity-0 group-hover:opacity-100 transition-all"></i>
+                    </div>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        // SELECT RECOMMENDATION
+        function selectRecommendation(text) {
+            document.getElementById('mainSearch').value = text;
+            document.getElementById('recommendationsDropdown').classList.add('hidden');
+            // You can trigger search here if needed
+            console.log('Selected: ' + text);
+        }
+
+        // CLOSE RECOMMENDATIONS WHEN CLICKING OUTSIDE
+        document.addEventListener('click', function(e) {
+            const searchContainer = document.querySelector('[id*="mainSearch"]').parentElement;
+            const dropdown = document.getElementById('recommendationsDropdown');
+            
+            if (!e.target.closest('.relative')) {
+                dropdown.classList.add('hidden');
+            }
+        });
+
+        // FILTER DROPDOWN FUNCTIONS
+        function toggleFilterDropdown() {
+            const menu = document.getElementById('filterDropdownMenu');
+            const icon = document.getElementById('filterDropdownIcon');
+            
+            if (menu.classList.contains('hidden')) {
+                menu.classList.remove('hidden');
+                icon.style.transform = 'rotate(180deg)';
+            } else {
+                menu.classList.add('hidden');
+                icon.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        function selectFilter(filterName, element) {
+            document.getElementById('selectedFilterText').textContent = filterName;
+            document.getElementById('filterDropdownMenu').classList.add('hidden');
+            document.getElementById('filterDropdownIcon').style.transform = 'rotate(0deg)';
+            
+            // Remove checkmark from all options
+            document.querySelectorAll('.filter-option .fa-check').forEach(check => {
+                check.classList.add('hidden');
+            });
+            
+            // Add checkmark to selected option
+            const checkmark = element.querySelector('.fa-check');
+            if (checkmark) {
+                checkmark.classList.remove('hidden');
+            }
+            
+            // Highlight selected option
+            document.querySelectorAll('.filter-option').forEach(btn => {
+                btn.classList.remove('bg-blue-100');
+            });
+            element.classList.add('bg-blue-100');
+            
+            console.log('Selected filter: ' + filterName);
+        }
+
+        // CLOSE FILTER DROPDOWN WHEN CLICKING OUTSIDE
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('#filterDropdownBtn') && !e.target.closest('#filterDropdownMenu')) {
+                document.getElementById('filterDropdownMenu').classList.add('hidden');
+                document.getElementById('filterDropdownIcon').style.transform = 'rotate(0deg)';
+                
+                // Remove highlight from non-selected options on close
+                document.querySelectorAll('.filter-option').forEach(btn => {
+                    if (!btn.querySelector('.fa-check:not(.hidden)')) {
+                        btn.classList.remove('bg-blue-100');
+                    }
+                });
+            }
+        });
+
+        // CLOSE MODAL CLICK OUTSIDE
+        document.getElementById('caseModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                document.getElementById('aiResponseArea').innerHTML='';
+                this.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+            }
+        });
+    </script>
+</body>
+</html>

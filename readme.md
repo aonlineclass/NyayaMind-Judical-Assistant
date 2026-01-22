@@ -1,6 +1,8 @@
 ``` md
 # NyayaMind – Technical Setup & Usage Flow
 
+# You will find .env file and Report/Presentation at google drive - 
+
 This document explains how to run the system and what you can do inside it, step by step.
 
 ---
